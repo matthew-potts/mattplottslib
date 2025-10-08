@@ -44,36 +44,28 @@ def multiline_plot(
     
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    # Plot each DataFrame with its corresponding key
     for df, key in zip(df, key):
         ax.plot(df['Date'], df['Trailing_4Q_Sum'], label=key)
 
-    # Set background color
     fig.patch.set_facecolor('white')
     ax.set_facecolor('white')
 
-    # Remove top and right borders
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
 
-    # Add grey bar for the period 2007 Q1 - 2008 Q2 if include_gfc is True
     if include_gfc:
         include_gfc(ax)
 
-    # Add title if provided
     if title:
         ax.set_title(title, fontsize=14, fontweight='bold')
 
-    # Set y-axis label with unit
     ax.set_ylabel(unit, fontsize=12)
 
     if sig_loc is not None:
         add_signature(sig_loc, ax)
 
-    # Add legend for the keys
     ax.legend()
 
-    # Display the plot
     plt.show()
 
 def add_signature(loc: str, ax: plt.Axes) -> None:

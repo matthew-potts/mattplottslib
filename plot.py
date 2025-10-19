@@ -68,6 +68,35 @@ def multiline_plot(
 
     plt.show()
 
+
+def scatter_plot(col1: pd.Series,
+                 col2: pd.Series, 
+                 title: str = None,
+                 sig_loc: str = None) -> None:
+    fig, ax = plt.subplots(figsize=(8, 8))
+    ax.scatter(col1, col2, color='blue', alpha=0.5)
+
+    if title:
+        ax.set_title(title, fontsize=14, fontweight='bold')
+
+    if sig_loc is not None:
+        add_signature(sig_loc, ax)
+
+    fig.patch.set_facecolor('white')
+    ax.set_facecolor('white')
+
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    ax.set_xlabel(col1.name, fontsize=12)
+    ax.set_ylabel(col2.name, fontsize=12)
+
+    plt.show()
+
+
+    
+
+
 def add_signature(loc: str, ax: plt.Axes) -> None:
     
     if loc == 'bottom right':

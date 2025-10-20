@@ -14,7 +14,7 @@ def line_plot(
         include_gfc: bool = False) -> None:
     
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(df['Date'], df['Trailing_4Q_Sum'], color='red', label=key)
+    ax.plot(df['Date'], df['Value'], color='red', label=key)
 
     fig.patch.set_facecolor('white')
     ax.set_facecolor('white')

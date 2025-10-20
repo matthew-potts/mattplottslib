@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 
@@ -70,17 +71,26 @@ def multiline_plot(
 
 
 def scatter_plot(col1: pd.Series,
-                 col2: pd.Series, 
-                 title: str = None,
-                 sig_loc: str = None) -> None:
+                col2: pd.Series,
+                title: str = None,
+                sig_loc: str = None) -> None:
     fig, ax = plt.subplots(figsize=(8, 8))
+
+    col1 = pd.to_numeric(col1, errors='coerce')
+    col2 = pd.to_numeric(col2, errors='coerce')
+
     ax.scatter(col1, col2, color='blue', alpha=0.5)
 
-    if title:
-        ax.set_title(title, fontsize=14, fontweight='bold')
-
-    if sig_loc is not None:
-        add_signature(sig_loc, ax)
+    x = pd.to_numeric(col1, errors='coerce')
+    y = pd.to_numeric(col2, errors='coerce')
+    mask = x.notna() & y.notna()
+    if mask.sum() > 1:
+        coef = np.polyfit(col1[mask], col2[mask], 1)
+        slope, intercept = coef[0], coef[1]
+        x_vals = np.linspace(col1[mask].min(), col1[mask].max(), 200)
+        y_vals = slope * x_vals + intercept
+        ax.plot(x_vals, y_vals, color='red', linewidth=2)
+        ax.legend()
 
     fig.patch.set_facecolor('white')
     ax.set_facecolor('white')
@@ -91,9 +101,13 @@ def scatter_plot(col1: pd.Series,
     ax.set_xlabel(col1.name, fontsize=12)
     ax.set_ylabel(col2.name, fontsize=12)
 
+    if title:
+        ax.set_title(title, fontsize=14, fontweight='bold')
+
+    if sig_loc is not None:
+        add_signature(sig_loc, ax)
+
     plt.show()
-
-
     
 
 

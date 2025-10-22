@@ -6,12 +6,13 @@ from matplotlib.patches import Rectangle
 _SIGNATURE = 'Matthew Potts\ncrossbordercode.com'
 
 def line_plot(
-        df: pd.DataFrame, 
-        title: str = None, 
-        unit : str = 'USD (millions)', 
-        key: str = 'Title',
-        sig_loc: str = None,
-        include_gfc: bool = False) -> None:
+    df: pd.DataFrame, 
+    title: str = None, 
+    unit : str = 'USD (millions)', 
+    key: str = 'Title',
+    sig_loc: str = None,
+    include_gfc: bool = False,
+    vlines: list | None = None) -> None:
     
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(df['Date'], df['Value'], color='red', label=key)
@@ -23,7 +24,7 @@ def line_plot(
     ax.spines['right'].set_visible(False)
     
     if include_gfc:
-        include_gfc(ax)        
+        add_gfc(ax)
     if title:
         ax.set_title(title, fontsize=14, fontweight='bold')
 
@@ -31,6 +32,40 @@ def line_plot(
 
     if sig_loc is not None:
         add_signature(sig_loc, ax)
+
+    if vlines:
+        for item in vlines:
+            date = None
+            label = None
+            opts = {}
+            if isinstance(item, dict):
+                date = item.get('date')
+                label = item.get('label')
+                opts = item.get('opts', {}) or {}
+            elif isinstance(item, (list, tuple)):
+                if len(item) >= 2:
+                    date, label = item[0], item[1]
+                if len(item) >= 3:
+                    opts = item[2] or {}
+            else:
+                date = item
+
+            if date is None:
+                continue
+
+            try:
+                dt = pd.to_datetime(date)
+            except Exception:
+                continue
+
+            ax.axvline(dt, **{**{'color': 'grey', 'linestyle': '--', 'alpha': 0.7}, **opts})
+
+            if label:
+                ylim = ax.get_ylim()
+                y = ylim[1] - (ylim[1] - ylim[0]) * 0.03
+                ax.text(dt, y, str(label), rotation=90, va='top', ha='right', fontsize=9,
+                        backgroundcolor='white', color=opts.get('color', 'black'),
+                        clip_on=True)
 
     ax.legend()
     plt.show()
@@ -55,7 +90,7 @@ def multiline_plot(
     ax.spines['right'].set_visible(False)
 
     if include_gfc:
-        include_gfc(ax)
+        add_gfc(ax)
 
     if title:
         ax.set_title(title, fontsize=14, fontweight='bold')
